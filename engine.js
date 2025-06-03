@@ -78,7 +78,7 @@ export class GameManager {
         this.state.questions = this.shuffle(questions);
         // Render board
         this.notifyObservers('renderBoard', { questions: this.state.questions })
-        this.notifyObservers('enablePanels', { panelsToEnable: 'boardPanels' })
+        // this.notifyObservers('enablePanels', { panelsToEnable: 'boardPanels' })
         // Start game - UI rendering
         this.notifyObservers("startGame", this.state);
 
@@ -116,12 +116,13 @@ export class GameManager {
 
     async handleAnswerClick(answerPanel, option, questionObject) {
         // soon as answer is clicked, you can't click again
-        this.notifyObservers('disablePanels', { panelsToDisable: 'answerPanels' })
+        // this.notifyObservers('disablePanels', { panelsToDisable: 'answerPanels' })
         let answerStatus;
         // Pre-format correct answer depending on question type (true/false vs multiple choice)
         const correctAnswer = questionObject.type == 'true-false' ?
             questionObject.correctAnswer.toString() :
             questionObject.correctAnswer
+
         if (option == correctAnswer) {
             // state update
             answerStatus = 'correct';
@@ -146,7 +147,7 @@ export class GameManager {
         // Move to the next team
         this.advanceTurn();
         await this.notifyObservers('renderBoard', { questions: this.state.questions, answerStatus: answerStatus })
-        this.notifyObservers('enablePanels', { panelsToEnable: 'boardPanels' })
+        // this.notifyObservers('enablePanels', { panelsToEnable: 'boardPanels' })
 
     }
 
@@ -186,7 +187,7 @@ export class GameManager {
         if (!this.state.stopCountDown) {
             this.advanceTurn();
             await this.notifyObservers('renderBoard', { questions: this.state.questions, answerStatus: 'timeout' })
-            this.notifyObservers('enablePanels', { panelsToEnable: 'boardPanels' })
+            // this.notifyObservers('enablePanels', { panelsToEnable: 'boardPanels' })
 
         }
     };

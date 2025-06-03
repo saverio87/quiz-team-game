@@ -67,7 +67,7 @@ export class GameObserver {
         const teamColor = this.gameController.colorMapping[this.gameController.state.currentTeamIndex]
         console.log(Array.from(this.panels.children));
         Array.from(this.panels.children).forEach(panel => {
-            console.log(panel);
+
             if (!panel.classList.contains('answered')) {
                 panel.style.backgroundColor = teamColor;
             }
@@ -101,6 +101,9 @@ export class GameObserver {
                 break;
             case 'answerPanels':
                 panelsToDisable = document.querySelector('.right-column').children
+                console.log(panelsToDisable);
+                break;
+            default:
                 break;
         }
 
@@ -178,7 +181,10 @@ export class GameObserver {
 
             // Attach the passed-in handleAnswerClick function
             // handleAnswerClick is inherited from gameController
-            answerPanel.addEventListener("click", () => this.gameController.handleAnswerClick(answerPanel, option, questionObject));
+            answerPanel.addEventListener("click", () => {
+                this.disablePanels('answerPanels');
+                this.gameController.handleAnswerClick(answerPanel, option, questionObject)
+            });
             rightColumn.appendChild(answerPanel);
         });
 
@@ -240,40 +246,46 @@ export class GameObserver {
                 this.updateBackdropColor();
                 await this.resetCountdownBar(payload.answerStatus);
                 await this.renderTeamsContainer();
+                this.enablePanels('boardPanels')
                 break
 
-            case "enablePanels":
-                let panelsToEnable;
+            // case "enablePanels":
+            //     let panelsToEnable;
 
-                switch (payload.panelsToEnable) {
-                    case 'boardPanels':
-                        panelsToEnable = this.panels.children;
-                        break;
-                    case 'answerPanels':
-                        console.log(document.querySelector('.right-column').children);
-                        panelsToEnable = document.querySelector('.right-column').children
-                        break;
-                }
-                Array.from(panelsToEnable).forEach(panel => {
-                    panel.style.pointerEvents = 'auto';
-                })
-                break;
+            //     switch (payload.panelsToEnable) {
+            //         case 'boardPanels':
+            //             panelsToEnable = this.panels;
+            //             break;
+            //         case 'answerPanels':
+            //             console.log(document.querySelector('.right-column').children);
+            //             panelsToEnable = document.querySelector('.question-display-container')
+            //             break;
+            //     }
+            //     panelsToEnable.style.pointerEvents = 'auto';
+            //     // Array.from(panelsToEnable).forEach(panel => {
+            //     //     panel.style.pointerEvents = 'auto';
+            //     // })
+            //     break;
 
-            case "disablePanels":
-                let panelsToDisable;
-                switch (payload.panelsToDisable) {
-                    case 'boardPanels':
-                        panelsToDisable = this.panels.children;
-                        break;
-                    case 'answerPanels':
-                        panelsToDisable = document.querySelector('.right-column').children
-                        break;
-                }
+            // case "disablePanels":
+            //     let panelsToDisable;
+            //     switch (payload.panelsToDisable) {
+            //         case 'boardPanels':
+            //             panelsToDisable = this.panels;
+            //             break;
+            //         case 'answerPanels':
+            //             panelsToEnable = document.querySelector('.question-display-container')
+            //             // panelsToDisable = document.querySelector('.right-column').children
+            //             break;
+            //     }
 
-                Array.from(panelsToDisable).forEach(panel => {
-                    panel.style.pointerEvents = 'none'
-                });
-                break;
+            //     panelsToEnable.style.pointerEvents = 'auto';
+
+
+            //     // Array.from(panelsToDisable).forEach(panel => {
+            //     //     panel.style.pointerEvents = 'none'
+            //     // });
+            //     break;
 
             case "panelsDisappear": // is passed panelElement
                 // 
@@ -291,7 +303,15 @@ export class GameObserver {
                 break;
 
             case "renderQuestionView": // is passed {question}
-                this.panels.innerHTML = ""
+                this.panels.innerHTML = "";
+                //
+                const previousQuestionView = document.querySelector('.question-display-container');
+                if (previousQuestionView) {
+                    console.log('removing previous question view...');
+                    document.remove(previousQuestionView);
+                }
+
+                //
                 const questionView = this.renderQuestionView(payload.question)
                 this.gameContainer.prepend(questionView)
                 this.disablePanels('answerPanels')
